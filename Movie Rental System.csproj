@@ -46,6 +46,7 @@
     <Compile Include="Genre\ActionMovies.cs" />
     <Compile Include="Genre\ComedyMovies.cs" />
     <Compile Include="Genre\HorrorMovies.cs" />
+    <Compile Include="Genre\WarMovies.cs" />
     <Compile Include="MovieInformation.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
