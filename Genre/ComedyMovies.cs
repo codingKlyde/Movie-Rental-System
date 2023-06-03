@@ -3,20 +3,14 @@
 
 class ComedyMovies : MovieInformation
 {
-    public ComedyMovies(int movieNumber = 0, string movieName = "", int releaseYear = 0, int rentalCost = 0)
-        : base(movieNumber, movieName, releaseYear, rentalCost) {}
+    // Constructor
+    public ComedyMovies(string movieName = "", int releaseYear = 0, int rentalCost = 0)
+        : base(movieName, releaseYear, rentalCost) { }
 
 
     // Method
-    public override int GetMovieID()
-    {
-        return movieID;
-    }
-
-    public override int GetRentalPrice()
-    {
-        return rentalPrice;
-    }
+    public override string GetMovieTitle() { return movieTitle; }
+    public override int GetRentalPrice() { return rentalPrice; }
 
     public override void DisplayMovie()
     {
@@ -24,16 +18,16 @@ class ComedyMovies : MovieInformation
         DisplayMovieInformation(comedyMovies);
     }
 
-    // Insert action movies
+    // Insert comedy movies
     public IEnumerable<ComedyMovies> GetComedyMovies()
     {
         return new List<ComedyMovies>
         {
-            new ComedyMovies(190501, "Luck", 2022, 899),
-            new ComedyMovies(190502, "Senior Year", 2022, 799),
-            new ComedyMovies(190503, "The Bubble", 2022, 599),
-            new ComedyMovies(190504, "Army of Thieves", 2021, 1199),
-            new ComedyMovies(190505, "Don't Look Up", 2021, 1299)
+            new ComedyMovies("Luck", 2022, 899),
+            new ComedyMovies("Senior Year", 2022, 799),
+            new ComedyMovies("The Bubble", 2022, 599),
+            new ComedyMovies("Army of Thieves", 2021, 1199),
+            new ComedyMovies("Don't Look Up", 2021, 1299)
         };
     }
 }

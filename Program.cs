@@ -6,7 +6,7 @@ namespace Movie_Rental_System
 {
     public class Program
     {
-        private static int total = 0; 
+        private static int total = 0;
 
 
         // START
@@ -15,7 +15,7 @@ namespace Movie_Rental_System
             Console.WriteLine("=== REND-A-MOVIE  ===\n\n");
 
 
-            MainMenu(); 
+            MainMenu();
         }
 
 
@@ -27,22 +27,17 @@ namespace Movie_Rental_System
             string[] menu = { "[P]opular Movies", "[L]atest Movies", "[S]earch" };
 
 
-            
-
-
+            // Display main menu and get input
             foreach (string menuOption in menu)
                 Console.WriteLine(menuOption);
-
-
             Console.Write(">> ");
             char menuInput = Convert.ToChar(Console.ReadLine());
 
             switch (char.ToUpper(menuInput))
             {
-                case 'P': PopularMovie(); break;
-                case 'L': LatestMovie(); break;
-                case 'S': SearchMovie(); break;
-                default: MainMenu(); break;
+                case 'P': PopularMovies(); break;
+                case 'L': LatestMovies(); break;
+                case 'S': Search(); break;
             }
         }
 
@@ -50,47 +45,64 @@ namespace Movie_Rental_System
 
 
 
-        private static void PopularMovie()
+        private static void PopularMovies()
         { Console.WriteLine("POPULAR"); }
 
 
 
 
 
-        private static void LatestMovie()
+        private static void LatestMovies()
         { Console.WriteLine("LATEST"); }
 
 
 
 
 
-        private static char SearchMovie()
+        private static void Search()
+        {
+            string[] searchOptions = { "\n1. Genre", "2. Year" };
+            int number;
+
+
+            // Display search options and get input
+            foreach (var displayOptions in searchOptions)
+                Console.WriteLine(displayOptions);
+            Console.Write(">> ");
+            string searchInput = Console.ReadLine();
+
+            if (int.TryParse(searchInput, out number))
+            {
+                switch (number)
+                {
+                    case 1: GenreSearch(); break;
+                    case 2: YearSearch(); break;
+                }
+            }
+            else
+                Console.WriteLine("\nInvalid input. Please enter a choice.");
+        }
+
+
+
+        private static char GenreSearch()
         {
             string[] genre = { "\n[A]ction", "[C]omedy", "[H]orror", "[W]ar" };
 
 
-            // Display menu
+            // Display genre menu and get input
             foreach (string genreOption in genre)
                 Console.WriteLine(genreOption);
-
             Console.Write(">> ");
             char genreInput = Convert.ToChar(Console.ReadLine());
             Console.WriteLine("");
 
             switch (char.ToUpper(genreInput))
             {
-                case 'A':
-                    new ActionMovies().DisplayMovie();
-                    break;
-                case 'C':
-                    new ComedyMovies().DisplayMovie();
-                    break;
-                case 'H':
-                    new HorrorMovies().DisplayMovie();
-                    break;
-                case 'W':
-                    new WarMovies().DisplayMovie();
-                    break;
+                case 'A': new ActionMovies().DisplayMovie(); break;
+                case 'C': new ComedyMovies().DisplayMovie(); break;
+                case 'H': new HorrorMovies().DisplayMovie(); break;
+                case 'W': new WarMovies().DisplayMovie(); break;
             }
 
             RentMovie(genreInput);
@@ -100,20 +112,28 @@ namespace Movie_Rental_System
         }
 
 
+
+
+
+        private static void YearSearch()
+        { Console.WriteLine(); }
+
+
+
+
+
         private static void RentMovie(char genreInput)
         {
-            int inputID;
-
-
             Console.WriteLine("\nInsert the movie ID you want to rent:");
             Console.Write(">> ");
             string rentInput = Console.ReadLine();
 
-            if (int.TryParse(rentInput, out inputID))
+            if (rentInput != null)
             {
                 bool movieExists = false;
                 int cost = 0;
                 IEnumerable<MovieInformation> movies = null;
+
 
                 switch (char.ToUpper(genreInput))
                 {
@@ -123,9 +143,10 @@ namespace Movie_Rental_System
                     case 'W': movies = new WarMovies().GetWarMovies(); break;
                 }
 
+
                 foreach (var movie in movies)
                 {
-                    if (movie.GetMovieID() == inputID)
+                    if (movie.GetMovieTitle() == rentInput)
                     {
                         movieExists = true;
                         cost = movie.GetRentalPrice();
@@ -138,27 +159,27 @@ namespace Movie_Rental_System
                 {
                     string[] again = { "[A]gain", "[B]ack", "[C]heckout" };
 
-  
-                    total += cost;
+
+                    total += cost;                                                
                     Console.WriteLine("\nTotal cost: {0}\n", total);
 
                     foreach (string againOption in again)
                         Console.WriteLine(againOption);
                     Console.Write(">> ");
                     char againInput = Convert.ToChar(Console.ReadLine());
-                    
+
                     switch (char.ToUpper(againInput))
                     {
                         case 'A': RentMovie(genreInput); break;
-                        case 'B': SearchMovie(); break;
-                        case 'C': 
-                            Console.WriteLine("\nTotal cost is {0}. Thanks for renting! :)", total); 
+                        case 'B': Search(); break;
+                        case 'C':
+                            Console.WriteLine("\nTotal cost is {0}. Thanks for renting! :)", total);
                             break;
-                    }   
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Sorry, the movie doesn't exist");
+                    Console.WriteLine("\nSorry, the movie doesn't exist in the current genre\n");
                     MainMenu();
                 }
             }
