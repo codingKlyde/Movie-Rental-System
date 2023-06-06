@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Movie_Rental_System
 {
     public class Program
     {
+        private static List<MovieInformation> rentedMovies = new List<MovieInformation>();          // Store all the rented movies in this list
         private static int total = 0;
 
 
@@ -15,29 +17,27 @@ namespace Movie_Rental_System
             Console.WriteLine("=== REND-A-MOVIE  ===\n\n");
 
 
-            MainMenu();
+            Menu();
         }
 
 
 
 
 
-        private static void MainMenu()
+        private static void Menu()
         {
-            string[] menu = { "[P]opular Movies", "[L]atest Movies", "[S]earch" };
+            string[] menuOption = { "[S]earch By" };
 
 
-            // Display main menu and get input
-            foreach (string menuOption in menu)
-                Console.WriteLine(menuOption);
-            Console.Write(">> ");
-            char menuInput = Convert.ToChar(Console.ReadLine());
+            // Display menu options and get input
+            foreach (string menuDisplay in menuOption)
+                Console.WriteLine(menuDisplay);
+            Console.Write("--\nINPUT: ");
+            char menuChoice = Convert.ToChar(Console.ReadLine());
 
-            switch (char.ToUpper(menuInput))
+            switch (char.ToUpper(menuChoice))
             {
-                case 'P': PopularMovies(); break;
-                case 'L': LatestMovies(); break;
-                case 'S': Search(); break;
+                case 'S': SearchBy(); break;
             }
         }
 
@@ -45,59 +45,48 @@ namespace Movie_Rental_System
 
 
 
-        private static void PopularMovies()
-        { Console.WriteLine("POPULAR"); }
-
-
-
-
-
-        private static void LatestMovies()
-        { Console.WriteLine("LATEST"); }
-
-
-
-
-
-        private static void Search()
+        private static void SearchBy()
         {
-            string[] searchOptions = { "\n1. Genre", "2. Year" };
-            int number;
+            string[] searchOption = { "\n1. Genre", "2. Price" };
+            int conv_searchChoice;
 
 
             // Display search options and get input
-            foreach (var displayOptions in searchOptions)
-                Console.WriteLine(displayOptions);
-            Console.Write(">> ");
-            string searchInput = Console.ReadLine();
+            foreach (var searchDisplay in searchOption)
+                Console.WriteLine(searchDisplay);
+            Console.Write("--\nINPUT: ");
+            string searchChoice = Console.ReadLine();
 
-            if (int.TryParse(searchInput, out number))
+            if (int.TryParse(searchChoice, out conv_searchChoice))
             {
-                switch (number)
+                switch (conv_searchChoice)
                 {
                     case 1: GenreSearch(); break;
-                    case 2: YearSearch(); break;
+                    case 2: PriceSearch(); break;
                 }
             }
             else
-                Console.WriteLine("\nInvalid input. Please enter a choice.");
+                Console.WriteLine("\nPlease enter a valid choice.");
         }
+
+
 
 
 
         private static char GenreSearch()
         {
-            string[] genre = { "\n[A]ction", "[C]omedy", "[H]orror", "[W]ar" };
+            string[] genreOption = { "\n[A]ction", "[C]omedy", "[H]orror", "[W]ar" };
 
 
-            // Display genre menu and get input
-            foreach (string genreOption in genre)
-                Console.WriteLine(genreOption);
-            Console.Write(">> ");
-            char genreInput = Convert.ToChar(Console.ReadLine());
+            // Display genre options and get input
+            foreach (string genreDisplay in genreOption)
+                Console.WriteLine(genreDisplay);
+            Console.Write("--\nINPUT: ");
+            char genreChoice = Convert.ToChar(Console.ReadLine());
             Console.WriteLine("");
 
-            switch (char.ToUpper(genreInput))
+            // Determine which genre to be retrieved
+            switch (char.ToUpper(genreChoice))
             {
                 case 'A': new ActionMovies().DisplayMovie(); break;
                 case 'C': new ComedyMovies().DisplayMovie(); break;
@@ -105,90 +94,138 @@ namespace Movie_Rental_System
                 case 'W': new WarMovies().DisplayMovie(); break;
             }
 
-            RentMovie(genreInput);
+            RentingProcess(genreChoice);
 
 
-            return genreInput;
+            return genreChoice;
         }
 
 
 
 
 
-        private static void YearSearch()
-        { Console.WriteLine(); }
-
-
-
-
-
-        private static void RentMovie(char genreInput)
+        private static char PriceSearch()
         {
-            Console.WriteLine("\nInsert the movie ID you want to rent:");
-            Console.Write(">> ");
-            string rentInput = Console.ReadLine();
+            string[] priceOption = { "\n", "A. 200-1200", "B. 1201-2200", "C. 2201-" };
 
-            if (rentInput != null)
+
+            // Display price options and get input
+            foreach (string genreDisplay in priceOption)
+                Console.WriteLine(genreDisplay);
+            Console.Write("--\nINPUT: ");
+            char priceChoice = Convert.ToChar(Console.ReadLine());
+            Console.WriteLine("");
+
+            IEnumerable<MovieInformation> moviesInRange = null;
+            IEnumerable<MovieInformation> allMovies = MovieInformation.GetAllMovies();          // Retrieve all movies
+
+            // Determine which price range to retrieve
+            switch (char.ToUpper(priceChoice))
             {
-                bool movieExists = false;
+                case 'A': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 200 && movie.GetRentalPrice() <= 1200); break;
+                case 'B': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 1201 && movie.GetRentalPrice() <= 2200); break;
+                case 'C': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 2201); break;
+            }
+
+
+            Console.WriteLine(" ===========================================================");
+            Console.WriteLine("            Movie            |     Year    |   Rent Price");
+            Console.WriteLine(" -----------------------------------------------------------");
+            foreach (MovieInformation movie in moviesInRange)
+                Console.WriteLine($"       {movie.GetMovieTitle(), -25}|     {movie.GetMovieRelease(), -6}  |      {movie.GetRentalPrice()}");
+            Console.WriteLine(" ===========================================================");
+
+
+            return priceChoice;
+        }
+
+
+
+
+
+        private static void RentingProcess(char genreChoice) 
+        {
+            Console.Write("\nInsert the movie title you want to rent: ");
+            string titleChoice = Console.ReadLine();    
+
+            if (!string.IsNullOrWhiteSpace(titleChoice))  // Checks if input is null, empty, or consists only of whitespace characters
+            {
+                bool movieTitle_exist = false;
                 int cost = 0;
-                IEnumerable<MovieInformation> movies = null;
+                IEnumerable<MovieInformation> byTitle_movies = null;
+                 
 
-
-                switch (char.ToUpper(genreInput))
+                switch (char.ToUpper(genreChoice))
                 {
-                    case 'A': movies = new ActionMovies().GetActionMovies(); break;
-                    case 'C': movies = new ComedyMovies().GetComedyMovies(); break;
-                    case 'H': movies = new HorrorMovies().GetHorrorMovies(); break;
-                    case 'W': movies = new WarMovies().GetWarMovies(); break;
+                    case 'A': byTitle_movies = new ActionMovies().GetActionMovies(); break;
+                    case 'C': byTitle_movies = new ComedyMovies().GetComedyMovies(); break;
+                    case 'H': byTitle_movies = new HorrorMovies().GetHorrorMovies(); break;
+                    case 'W': byTitle_movies = new WarMovies().GetWarMovies(); break;
                 }
 
 
-                foreach (var movie in movies)
+                foreach (var movie in byTitle_movies)
                 {
-                    if (movie.GetMovieTitle() == rentInput)
+                    if (movie.GetMovieTitle() == titleChoice)
                     {
-                        movieExists = true;
+                        movieTitle_exist = true;
                         cost = movie.GetRentalPrice();
                         break;
                     }
                 }
 
 
-                if (movieExists)
+                if (movieTitle_exist)
                 {
-                    string[] again = { "[A]gain", "[B]ack", "[C]heckout" };
+                    string[] againOption = { "[A]gain", "[B]ack", "[C]heckout" };
 
 
                     total += cost;                                                
-                    Console.WriteLine("\nTotal cost: {0}\n", total);
+                    Console.WriteLine("\nMovie added to cart\n");
 
-                    foreach (string againOption in again)
-                        Console.WriteLine(againOption);
-                    Console.Write(">> ");
-                    char againInput = Convert.ToChar(Console.ReadLine());
+                    // Add the selected movie to the rentedMovies list
+                    MovieInformation selectedMovie = byTitle_movies.FirstOrDefault(movie => movie.GetMovieTitle() == titleChoice);
+                    rentedMovies.Add(selectedMovie);
 
-                    switch (char.ToUpper(againInput))
+                    // Display choice to rent again and get input
+                    foreach (string againDisplay in againOption)
+                        Console.WriteLine(againDisplay);
+                    Console.Write("--\nINPUT: ");
+                    char againChoice = Convert.ToChar(Console.ReadLine());
+
+                    switch (char.ToUpper(againChoice))
                     {
-                        case 'A': RentMovie(genreInput); break;
-                        case 'B': Search(); break;
-                        case 'C':
-                            Console.WriteLine("\nTotal cost is {0}. Thanks for renting! :)", total);
-                            break;
+                        case 'A': RentingProcess(genreChoice); break;
+                        case 'B': SearchBy(); break;
+                        case 'C': Checkout(); break;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("\nSorry, the movie doesn't exist in the current genre\n");
-                    MainMenu();
+                    Console.WriteLine("\nSorry, the movie doesn't exist in the current genre.\n");
+                    RentingProcess(genreChoice);
                 }
             }
             else
             {
-                Console.WriteLine("Please enter a correct movie ID");
-                RentMovie(genreInput);
+                Console.WriteLine("Please enter a correct movie ID.");
+                RentingProcess(genreChoice);
             }
             Console.WriteLine();
+        }
+
+
+
+
+
+        private static void Checkout()
+        {
+            Console.WriteLine("\n======================================");
+            foreach (MovieInformation movie in rentedMovies)
+                Console.WriteLine($"  {movie.GetMovieTitle(), -20} ................ PHP {movie.GetRentalPrice()}");
+
+            Console.WriteLine($"\n  TOTAL:                                PHP {total}");
+            Console.WriteLine("======================================");
         }
     }
 }

@@ -10,6 +10,7 @@ class WarMovies : MovieInformation
 
     // Method
     public override string GetMovieTitle() { return movieTitle; }
+    public override int GetMovieRelease() { return movieRelease; }
     public override int GetRentalPrice() { return rentalPrice; }
 
     public override void DisplayMovie()
@@ -17,6 +18,7 @@ class WarMovies : MovieInformation
         IEnumerable<WarMovies> warMovies = GetWarMovies();
         DisplayMovieInformation(warMovies);
     }
+
 
     // Insert war movies
     public IEnumerable<WarMovies> GetWarMovies()

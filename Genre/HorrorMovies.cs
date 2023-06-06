@@ -10,6 +10,7 @@ class HorrorMovies : MovieInformation
 
     // Method
     public override string GetMovieTitle() { return movieTitle; }
+    public override int GetMovieRelease() { return movieRelease; }
     public override int GetRentalPrice() { return rentalPrice; }
 
     public override void DisplayMovie()
@@ -17,6 +18,7 @@ class HorrorMovies : MovieInformation
         IEnumerable<HorrorMovies> horrorMovies = GetHorrorMovies();
         DisplayMovieInformation(horrorMovies);
     }
+
 
     // Insert horror movies
     public IEnumerable<HorrorMovies> GetHorrorMovies()
