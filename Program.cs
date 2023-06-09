@@ -14,7 +14,7 @@ namespace Movie_Rental_System
         // START
         static void Main(string[] args)
         {
-            Console.WriteLine("=== REND-A-MOVIE  ===\n\n");
+            Console.WriteLine("===> RENT-A-MOVIE  <===\n\n");
 
 
             Menu();
@@ -203,13 +203,11 @@ namespace Movie_Rental_System
                 else
                 {
                     Console.WriteLine("\nSorry, the movie doesn't exist in the current genre.\n");
-                    RentingProcess(genreChoice);
                 }
             }
             else
             {
                 Console.WriteLine("Please enter a correct movie ID.");
-                RentingProcess(genreChoice);
             }
             Console.WriteLine();
         }
