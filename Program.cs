@@ -7,18 +7,16 @@ namespace Movie_Rental_System
 {
     public class Program
     {
+        private static string[] menuOption = { "Search" };                                         // Menu()
+        private static string[] searchOption = { "Genre", "Price" };                               // Search()
+        private static string[] againOption = { "Again", "Back", "Checkout" };                      // HandleRentAgainChoice()
         private static List<MovieInformation> rentedMovies = new List<MovieInformation>();          // Store all the rented movies in this list
         private static int total = 0;
-
+            
 
         // START
         static void Main(string[] args)
-        {
-            Console.WriteLine("===> RENT-A-MOVIE  <===\n\n");
-
-
-            Menu();
-        }
+        { Menu(); }
 
 
 
@@ -26,142 +24,132 @@ namespace Movie_Rental_System
 
         private static void Menu()
         {
-            string[] menuOption = { "[S]earch By" };
+            char menuChoice = MenuOption(menuOption);
 
-
-            // Display menu options and get input
-            foreach (string menuDisplay in menuOption)
-                Console.WriteLine(menuDisplay);
-            Console.Write("--\nINPUT: ");
-            char menuChoice = Convert.ToChar(Console.ReadLine());
-
-            switch (char.ToUpper(menuChoice))
+            switch (menuChoice)
             {
-                case 'S': SearchBy(); break;
+                case '1': Search(); break;
+                default: Console.WriteLine("\nPlease enter a valid choice.\n"); break;
             }
+        }
+
+        private static void Search()
+        {
+            char searchChoice = MenuOption(searchOption);
+
+            switch (searchChoice)
+            {
+                case '1': RentByGenre(); break;
+                case '2': RentByPrice(); break;
+                default: Console.WriteLine("\nPlease enter a valid choice.\n"); break;
+            }
+        }
+
+        public static void HandleRentAgainChoice()
+        {
+            char againChoice = MenuOption(againOption);
+
+            switch (againChoice)
+            {
+                case '1': Search(); break;
+                case '2': Menu(); break;
+                case '3': Checkout(); break;
+                default: Console.WriteLine("\nPlease enter a valid choice.\n"); break;
+            }
+        }
+
+        public static void Checkout()
+        {
+            Console.WriteLine("\n===========================================");
+            foreach (MovieInformation movie in rentedMovies)
+                Console.WriteLine($"  {movie.GetMovieTitle(), -27}  PHP {movie.GetRentalPrice()}");
+
+            Console.WriteLine($"\n  TOTAL COST                   PHP {total}");
+            Console.WriteLine("===========================================");
         }
 
 
 
 
 
-        private static void SearchBy()
+        private static char MenuOption(string[] displayOption)
         {
-            string[] searchOption = { "\n1. Genre", "2. Price" };
-            int conv_searchChoice;
+            char choice = ' '; 
+            bool validChoice = false;
 
 
-            // Display search options and get input
-            foreach (var searchDisplay in searchOption)
-                Console.WriteLine(searchDisplay);
-            Console.Write("--\nINPUT: ");
-            string searchChoice = Console.ReadLine();
-
-            if (int.TryParse(searchChoice, out conv_searchChoice))
+            while (!validChoice)
             {
-                switch (conv_searchChoice)
+                // Display menu options
+                for (int i = 0; i < displayOption.Length; i++)
+                    Console.WriteLine($"[{i + 1}] {displayOption[i]}");
+
+                // Get input
+                Console.Write("--\nINPUT: ");
+                string input = Console.ReadLine();
+                Console.WriteLine();
+
+                // Checks if input is not more than one character
+                // Checks if the input is not parsable to char
+                if (input.Length != 1 || !char.TryParse(input, out choice))
                 {
-                    case 1: GenreSearch(); break;
-                    case 2: PriceSearch(); break;
+                    Console.WriteLine("\nPlease enter a valid numeric choice.\n"); continue;
                 }
+                // Checks if input is not greater or lesser than the range of options
+                if (choice < '1' || choice > displayOption.Length.ToString()[0])
+                {
+                    Console.WriteLine("\nPlease enter a valid choice.\n"); continue;
+                }
+                validChoice = true;
             }
-            else
-                Console.WriteLine("\nPlease enter a valid choice.");
+
+
+            return choice;
         }
 
 
 
 
 
-        private static char GenreSearch()
+
+
+
+
+
+        private static void RentByGenre()
         {
-            string[] genreOption = { "\n[A]ction", "[C]omedy", "[H]orror", "[W]ar" };
+            string[] genreOption = { "Action", "Comedy", "Horror", "War" };
 
 
-            // Display genre options and get input
-            foreach (string genreDisplay in genreOption)
-                Console.WriteLine(genreDisplay);
-            Console.Write("--\nINPUT: ");
-            char genreChoice = Convert.ToChar(Console.ReadLine());
-            Console.WriteLine("");
+            char genreChoice = MenuOption(genreOption);
 
-            // Determine which genre to be retrieved
-            switch (char.ToUpper(genreChoice))
+            switch (genreChoice)
             {
-                case 'A': new ActionMovies().DisplayMovie(); break;
-                case 'C': new ComedyMovies().DisplayMovie(); break;
-                case 'H': new HorrorMovies().DisplayMovie(); break;
-                case 'W': new WarMovies().DisplayMovie(); break;
-            }
-
-            RentingProcess(genreChoice);
-
-
-            return genreChoice;
-        }
-
-
-
-
-
-        private static char PriceSearch()
-        {
-            string[] priceOption = { "\n", "A. 200-1200", "B. 1201-2200", "C. 2201-" };
-
-
-            // Display price options and get input
-            foreach (string genreDisplay in priceOption)
-                Console.WriteLine(genreDisplay);
-            Console.Write("--\nINPUT: ");
-            char priceChoice = Convert.ToChar(Console.ReadLine());
-            Console.WriteLine("");
-
-            IEnumerable<MovieInformation> moviesInRange = null;
-            IEnumerable<MovieInformation> allMovies = MovieInformation.GetAllMovies();          // Retrieve all movies
-
-            // Determine which price range to retrieve
-            switch (char.ToUpper(priceChoice))
-            {
-                case 'A': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 200 && movie.GetRentalPrice() <= 1200); break;
-                case 'B': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 1201 && movie.GetRentalPrice() <= 2200); break;
-                case 'C': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 2201); break;
+                case '1': new ActionMovies().DisplayMovie(); break;
+                case '2': new ComedyMovies().DisplayMovie(); break;
+                case '3': new HorrorMovies().DisplayMovie(); break;
+                case '4': new WarMovies().DisplayMovie(); break;
             }
 
 
-            Console.WriteLine(" ===========================================================");
-            Console.WriteLine("            Movie            |     Year    |   Rent Price");
-            Console.WriteLine(" -----------------------------------------------------------");
-            foreach (MovieInformation movie in moviesInRange)
-                Console.WriteLine($"       {movie.GetMovieTitle(), -25}|     {movie.GetMovieRelease(), -6}  |      {movie.GetRentalPrice()}");
-            Console.WriteLine(" ===========================================================");
-
-
-            return priceChoice;
-        }
-
-
-
-
-
-        private static void RentingProcess(char genreChoice) 
-        {
             Console.Write("\nInsert the movie title you want to rent: ");
-            string titleChoice = Console.ReadLine();    
+            string titleChoice = Console.ReadLine();
 
-            if (!string.IsNullOrWhiteSpace(titleChoice))  // Checks if input is null, empty, or consists only of whitespace characters
+            IEnumerable<MovieInformation> byTitle_movies = null;
+
+            switch (genreChoice)
+            {
+                case '1': byTitle_movies = new ActionMovies().GetActionMovies(); break;
+                case '2': byTitle_movies = new ComedyMovies().GetComedyMovies(); break;
+                case '3': byTitle_movies = new HorrorMovies().GetHorrorMovies(); break;
+                case '4': byTitle_movies = new WarMovies().GetWarMovies(); break;
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(titleChoice))
             {
                 bool movieTitle_exist = false;
                 int cost = 0;
-                IEnumerable<MovieInformation> byTitle_movies = null;
-                 
-
-                switch (char.ToUpper(genreChoice))
-                {
-                    case 'A': byTitle_movies = new ActionMovies().GetActionMovies(); break;
-                    case 'C': byTitle_movies = new ComedyMovies().GetComedyMovies(); break;
-                    case 'H': byTitle_movies = new HorrorMovies().GetHorrorMovies(); break;
-                    case 'W': byTitle_movies = new WarMovies().GetWarMovies(); break;
-                }
 
 
                 foreach (var movie in byTitle_movies)
@@ -177,38 +165,20 @@ namespace Movie_Rental_System
 
                 if (movieTitle_exist)
                 {
-                    string[] againOption = { "[A]gain", "[B]ack", "[C]heckout" };
-
-
-                    total += cost;                                                
+                    total += cost;
                     Console.WriteLine("\nMovie added to cart\n");
 
                     // Add the selected movie to the rentedMovies list
                     MovieInformation selectedMovie = byTitle_movies.FirstOrDefault(movie => movie.GetMovieTitle() == titleChoice);
                     rentedMovies.Add(selectedMovie);
 
-                    // Display choice to rent again and get input
-                    foreach (string againDisplay in againOption)
-                        Console.WriteLine(againDisplay);
-                    Console.Write("--\nINPUT: ");
-                    char againChoice = Convert.ToChar(Console.ReadLine());
-
-                    switch (char.ToUpper(againChoice))
-                    {
-                        case 'A': RentingProcess(genreChoice); break;
-                        case 'B': SearchBy(); break;
-                        case 'C': Checkout(); break;
-                    }
+                    HandleRentAgainChoice();
                 }
                 else
-                {
                     Console.WriteLine("\nSorry, the movie doesn't exist in the current genre.\n");
-                }
             }
             else
-            {
                 Console.WriteLine("Please enter a correct movie ID.");
-            }
             Console.WriteLine();
         }
 
@@ -216,14 +186,68 @@ namespace Movie_Rental_System
 
 
 
-        private static void Checkout()
+        private static void RentByPrice()
         {
-            Console.WriteLine("\n======================================");
-            foreach (MovieInformation movie in rentedMovies)
-                Console.WriteLine($"  {movie.GetMovieTitle(), -20} ................ PHP {movie.GetRentalPrice()}");
+            string[] priceOption = { "PHP 200-1200", "PHP 1201-2200", "PHP 2201-" };
 
-            Console.WriteLine($"\n  TOTAL:                                PHP {total}");
-            Console.WriteLine("======================================");
+
+            char priceChoice = MenuOption(priceOption);
+
+            IEnumerable<MovieInformation> moviesInRange = null;
+            IEnumerable<MovieInformation> allMovies = MovieInformation.GetAllMovies();          // Retrieve all movies
+
+            switch (priceChoice)
+            {
+                case '1': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 200 && movie.GetRentalPrice() <= 1200); break;
+                case '2': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 1201 && movie.GetRentalPrice() <= 2200); break;
+                case '3': moviesInRange = allMovies.Where(movie => movie.GetRentalPrice() >= 2201); break;
+            }
+
+
+            // Display movies based on the selected price range
+            Console.WriteLine(" ===========================================================");
+            Console.WriteLine("            Movie            |     Year    |   Rent Price");
+            Console.WriteLine(" -----------------------------------------------------------");
+            foreach (MovieInformation movie in moviesInRange)
+                Console.WriteLine($"       {movie.GetMovieTitle(),-22}|     {movie.GetMovieRelease(),-6}  |      {movie.GetRentalPrice()}");
+            Console.WriteLine(" ===========================================================");
+
+
+            Console.Write("\nInsert the movie title you want to rent: ");
+            string titleChoice = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(titleChoice))  // Checks if input is null, empty, or consists only of whitespace characters
+            {
+                bool movieTitle_exists = false;
+                int cost = 0;
+
+                foreach (var movie in moviesInRange)
+                {
+                    if (movie.GetMovieTitle() == titleChoice)
+                    {
+                        movieTitle_exists = true;
+                        cost = movie.GetRentalPrice();
+                        break;
+                    }
+                }
+
+
+                if (movieTitle_exists)
+                {
+                    total += cost;
+                    Console.WriteLine("\nMovie added to cart\n");
+
+                    // Add the selected movie to the rentedMovies list
+                    MovieInformation selectedMovie = moviesInRange.FirstOrDefault(movie => movie.GetMovieTitle() == titleChoice);
+                    rentedMovies.Add(selectedMovie);
+
+                    HandleRentAgainChoice();
+                }
+                else
+                    Console.WriteLine("\nSorry, the movie doesn't exist in the current genre.\n");
+            }
+            else
+                Console.WriteLine("Please enter a correct movie ID.");
         }
     }
 }

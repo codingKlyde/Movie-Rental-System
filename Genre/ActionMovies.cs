@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 
-class ActionMovies : MovieInformation
+public class ActionMovies : MovieInformation
 {
     // Constructor
     public ActionMovies(string movieName = "", int releaseYear = 0, int rentalCost = 0)
